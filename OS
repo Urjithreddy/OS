@@ -1,0 +1,604 @@
+//Program for FCFS
+#include<stdio.h>
+int main()
+{
+  int i,n,bt[10],at[10],tat[10],wt[10],complt=0;
+  float avgtat=0,avgwt=0,totaltat=0,totalwt=0;
+  printf("enter the no. of processes:\t");
+  scanf("%d",&n);
+  printf("enter burst time");
+  for(i=0;i<n;i++)
+    {printf("Burst time of process-%d:\t",i+1);
+      scanf("%d", &bt[i]);
+      printf("\n");
+    }
+  //set arrival time to zero for all process
+  for(i=0;i<n;i++)
+    at[i]=0;
+  //caalculate TAT
+  for(i=0;i<n;i++)
+    {
+      complt=complt+bt[i];
+      tat[i]=complt-at[i];
+      totaltat=totaltat+tat[i];
+    }
+  avgtat=(float)totaltat/n;
+  
+  // calculate wait time
+  for(i=0;i<n;i++)
+    {
+      wt[i]=tat[i]-bt[i];
+      totalwt=totalwt+wt[i];
+    }
+  avgwt=(float)totalwt/n;
+
+  printf("ProcessNo  Burst_time  Wait_time  Turnaround_time\n");
+  for(i=0;i<n;i++)
+    {
+      printf("%d\t\t\t",i+1);
+      printf("%d\t\t\t",bt[i]);
+      printf("%d\t\t\t",wt[i]);
+      printf("%d\t\t\t",tat[i]);
+      printf("\n");
+      printf("\n");
+    }
+  printf("Average wt and tat is %f and %f",avgwt,avgtat);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SJF
+
+#include<stdio.h>
+int main()
+{
+    int bt[20],p[20],wt[20],tat[20],i,j,n,total=0,totalT=0,pos,temp;
+    float avg_wt,avg_tat;
+    printf("Enter number of process:");
+    scanf("%d",&n);
+ 
+    printf("\nEnter Burst Time:\n");
+    for(i=0;i<n;i++)
+    {
+        printf("p%d:",i+1);
+        scanf("%d",&bt[i]);
+        p[i]=i+1;  //creating a process id array
+    }
+ 
+    //sorting of burst times
+    for(i=0;i<n;i++)
+    {
+        pos=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(bt[j]<bt[pos])
+                pos=j;
+        }
+ //arranging burst times
+        temp=bt[i];
+        bt[i]=bt[pos];
+        bt[pos]=temp;
+ //arranging proceess ids
+        temp=p[i];
+        p[i]=p[pos];
+        p[pos]=temp;
+    }
+ 
+    wt[0]=0;
+ 
+    //finding the waiting time of all the processes
+    for(i=1;i<n;i++)
+    {
+        wt[i]=0;
+        for(j=0;j<i;j++)
+             //individual WT by adding BT of all previous completed processes
+            wt[i]+=bt[j];
+ 
+        //total waiting time
+        total+=wt[i];   
+    }
+ 
+    //average waiting time
+    avg_wt=(float)total/n;  
+ 
+    printf("\nProcess\t Burst Time \tWaiting Time\tTurnaround Time");
+    for(i=0;i<n;i++)
+    {
+        //turnaround time of individual processes
+        tat[i]=bt[i]+wt[i]; 
+ 
+        //total turnaround time
+        totalT+=tat[i];      
+        printf("\np%d\t\t\t %d\t\t\t %d\t\t\t\t%d",p[i],bt[i],wt[i],tat[i]);
+    }
+ 
+    //average turnaround time
+    avg_tat=(float)totalT/n;     
+    printf("\n\nAverage Waiting Time=%f",avg_wt);
+    printf("\nAverage Turnaround Time=%f",avg_tat);
+}
+
+
+
+
+
+
+
+Round robin
+#include<stdio.h>
+ int main()
+{
+  int i,j,n,t,remain,flag=0,tq;
+  int wt=0,tat=0,at[10],bt[10],rt[10];
+  printf("Enter Total Process:\t ");
+  scanf("%d",&n);
+  remain=n;
+  for(i=0;i<n;i++)
+  {
+    printf("Enter Arrival Time and Burst Time for Process Process Number %d :",i+1);
+    scanf("%d",&at[i]);
+    scanf("%d",&bt[i]);
+    rt[i]=bt[i];
+  }
+  printf("Enter Time Quantum:\t");
+  scanf("%d",&tq);
+  printf("\n\nProcess\t|Burst Time|Turnaround Time|Waiting Time\n\n");
+  for(t=0,i=0;remain!=0;)
+  {
+    if(rt[i]<=tq && rt[i]>0)
+    {
+      t+=rt[i];
+      rt[i]=0;
+      flag=1;
+    }
+    else if(rt[i]>0)
+    {
+      rt[i]-=tq;
+      t+=tq;
+    }
+    if(rt[i]==0 && flag==1)
+    {
+      remain--;
+      printf("P[%d]\t|\t%d\t|\t%d\t|\t%d\n",i+1,bt[i],t-at[i],t-at[i]-bt[i]);
+      wt+=t-at[i]-bt[i];
+      tat+=t-at[i];
+      flag=0;
+    }
+    if(i==n-1)
+      i=0;
+    else if(at[i+1]<=t)
+      i++;
+    else
+      i=0;
+  }
+  printf("\nAverage Waiting Time= %f\n",wt*1.0/n);
+  printf("Avg Turnaround Time = %f",tat*1.0/n);
+  
+  return 0;
+}
+
+
+
+
+
+
+
+
+Priority scheduling
+
+
+#include <stdio.h>
+ 
+//Function to swap two variables
+void swap(int *a,int *b)
+{
+    int temp=*a;
+    *a=*b;
+    *b=temp;
+}
+int main()
+{
+    int n;
+    printf("Enter Number of Processes: ");
+    scanf("%d",&n);
+ 
+    // b is array for burst time, p for priority and index for process id
+    int b[n],p[n],index[n];
+    for(int i=0;i<n;i++)
+    {
+        printf("Enter Burst Time and Priority Value for Process %d: ",i+1);
+        scanf("%d %d",&b[i],&p[i]);
+        index[i]=i+1;
+    }
+    for(int i=0;i<n;i++)
+    {
+        int a=p[i],m=i;
+ 
+        //Finding out highest priority element and placing it at its desired position
+        for(int j=i;j<n;j++)
+        {
+            if(p[j] > a)
+            {
+                a=p[j];
+                m=j;
+            }
+        }
+ 
+        //Swapping processes
+        swap(&p[i], &p[m]);
+        swap(&b[i], &b[m]);
+        swap(&index[i],&index[m]);
+    }
+ 
+    // T stores the starting time of process
+    int t=0;
+ 
+    //Printing scheduled process
+    printf("Order of process Execution is\n");
+    for(int i=0;i<n;i++)
+    {
+        printf("P%d is executed from %d to %d\n",index[i],t,t+b[i]);
+        t+=b[i];
+    }
+    printf("\n");
+    printf("Process Id     Burst Time   Wait Time    TurnAround Time\n");
+    int wait_time=0;
+    for(int i=0;i<n;i++)
+    {
+        printf("P%d\t\t\t|\t%d\t\t\t|\t%d\t\t\t|\t%d\n",index[i],b[i],wait_time,wait_time + b[i]);
+        wait_time += b[i];
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+Producer problem
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+int mutex = 1;
+int full = 0;
+int empty = 10, x = 0;
+
+void producer()
+{
+    #pragma omp critical
+    {
+        --mutex;
+        ++full;
+        --empty;
+        x++;
+        printf("\nProducer produces item %d", x);
+        ++mutex;
+    }
+}
+
+void consumer()
+{
+    #pragma omp critical
+    {
+        --mutex;
+        --full;
+        ++empty;
+        printf("\nConsumer consumes item %d", x);
+        x--;
+        ++mutex;
+    }
+}
+
+int main()
+{
+    int n, i;
+    printf("\n1. Press 1 for Producer"
+           "\n2. Press 2 for Consumer"
+           "\n3. Press 3 for Exit");
+
+    #pragma omp parallel for
+    for (i = 1; i > 0; i++)
+    {
+        printf("\nEnter your choice:");
+        scanf("%d", &n);
+
+        switch (n)
+        {
+        case 1:
+            if ((mutex == 1) && (empty != 0))
+            {
+                producer();
+            }
+            else
+            {
+                printf("Buffer is full!");
+            }
+            break;
+
+        case 2:
+            if ((mutex == 1) && (full != 0))
+            {
+                consumer();
+            }
+            else
+            {
+                printf("Buffer is empty!");
+            }
+            break;
+
+        case 3:
+            exit(0);
+            break;
+        }
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Wait
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+#include<unistd.h>
+
+int main()
+{
+	pid_t cpid;
+	if (fork()== 0)
+		exit(0);		 /* terminate child */
+	else
+		cpid = wait(NULL); /* reaping parent */
+	printf("Parent pid = %d\n", getpid());
+	printf("Child pid = %d\n", cpid);
+
+	return 0;
+}
+
+
+
+
+
+
+
+Sleep
+// C program to demonstrate
+// use of sleep function
+// till 10 seconds in Linux.
+#include <stdio.h>
+#include <unistd.h>
+
+int main()
+{
+
+	// This line will be executed first
+	printf("Program to sleep for 10 second in Linux.\n");
+
+	sleep(10);
+	// after 10 seconds this next line will be executed.
+
+	printf("This line will be executed after 10 second.");
+
+	return 0;
+}
+
+
+
+
+fork 1
+
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+int main()
+{ 
+fork ();
+printf("hello welcome\nPID= %d\n", getpid());
+return 0;
+}
+
+
+
+
+
+
+
+
+
+fork 3
+
+
+
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+int main()
+{ 
+fork ();
+fork ();
+fork ();
+printf("hello welcome\nPID= %d\n", getpid());
+return 0;
+}
+
+ex1
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+int main(int argc, char *argv[])
+{ 
+printf("PID of ex1.c = %d\n",getpid());
+char *args[] = {"hello","world", NULL};
+execv("./ex2",args);
+printf("back to exc1.c");
+return 0;
+}
+
+
+
+
+
+
+ex2
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+int main(int argc, char *argv[])
+{ 
+printf(" we are ex2.c\n");
+printf("PID Of ex2.c =%d\n", getpid());
+return 0;
+}
+
+
+
+
+
+
+eg1
+#include<stdio.h>
+#include<unistd.h>
+int main()
+{
+write(1,"hello\n",6); //1 is the file descriptor, "hello\n" is the data, 6 is the count of characters in data
+}
+
+
+eg2
+#include<stdio.h>
+#include<unistd.h>
+int main()
+{
+int count;
+
+count=write(1,"hello\n",3);
+printf("Total bytes written: %d\n",count);
+}
+
+
+
+eg3
+#include<unistd.h>
+#include<stdio.h>
+int main()
+{
+int count;
+count=write(3,"hello\n",6); //the file descriptor is not one of the pre-specified ones i.e., 0, 1 or 2
+printf("Total bytes written: %d\n",count);
+}
+
+
+
+
+eg4
+
+
+#include<unistd.h>
+int main()
+{
+char buff[200];
+read(0,buff,100);//read 10 bytes from standard input device(keyboard), store in buffer (buff)
+write(1,buff,100);//print 10 bytes from the buffer on the screen
+}
+
+
+
+eg5
+#include<unistd.h>
+int main()
+{
+int nread;
+char buff[20];
+nread=read(0,buff,10);//read 10 bytes from standard input device(keyboard), store in buffer (buff)
+write(1,buff,nread);//print 10 bytes from the buffer on the screen
+}
+
+
+eg6
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+int main()
+{
+int n,fd,fd1;
+char buff[50];
+fd=open("test.txt",O_RDONLY);
+n=read(fd,buff,10);
+fd1=open("towrite.txt",O_WRONLY|O_CREAT,0642);//use the pipe symbol (|) to separate O_WRONLY and O_CREAT
+write(fd1,buff,n);
+}
+
+eg7
+#include<unistd.h>
+#include<fcntl.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+int main()
+{
+int n,f;
+char buff[10];
+f=open("test.txt",O_RDWR);
+read(f,buff,50);
+write(1,buff,50);
+lseek(f,5,SEEK_SET);//skips 5 characters from the current position
+read(f,buff,10);
+write(1,buff,10);
+}
+
+
+
+
+
