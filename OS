@@ -273,9 +273,10 @@ int main()
 
 
 Producer problem
+
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <omp.h>
 
 int mutex = 1;
 int full = 0;
@@ -283,28 +284,22 @@ int empty = 10, x = 0;
 
 void producer()
 {
-    #pragma omp critical
-    {
-        --mutex;
-        ++full;
-        --empty;
-        x++;
-        printf("\nProducer produces item %d", x);
-        ++mutex;
-    }
+    --mutex;
+    ++full;
+    --empty;
+    x++;
+    printf("\nProducer produces item %d", x);
+    ++mutex;
 }
 
 void consumer()
 {
-    #pragma omp critical
-    {
-        --mutex;
-        --full;
-        ++empty;
-        printf("\nConsumer consumes item %d", x);
-        x--;
-        ++mutex;
-    }
+    --mutex;
+    --full;
+    ++empty;
+    printf("\nConsumer consumes item %d", x);
+    x--;
+    ++mutex;
 }
 
 int main()
@@ -314,7 +309,6 @@ int main()
            "\n2. Press 2 for Consumer"
            "\n3. Press 3 for Exit");
 
-    #pragma omp parallel for
     for (i = 1; i > 0; i++)
     {
         printf("\nEnter your choice:");
